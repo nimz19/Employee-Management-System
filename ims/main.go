@@ -30,9 +30,9 @@ func main() {
 
     // Use employeeDAO to add a new employee
     emp := model.Employee{
-        FirstName:  "Amy",
-        LastName:   "O'Connor",
-        Email:      "amy123@gmail.com",
+        FirstName:  "Molly",
+        LastName:   "Richards",
+        Email:      "mollyrichards@gmail.com",
         Department: "Software Engineer",
         Salary:     45000.00,
     }
