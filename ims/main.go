@@ -7,9 +7,10 @@ import (
     "log"
     "time"
 
-    "github.com/nimz19/Employee-Management-System/ims/dao"  // Correct import path
-    "github.com/nimz19/Employee-Management-System/ims/model" // Import the model package
-    _ "github.com/go-sql-driver/mysql"                       // Import the MySQL driver
+    "github.com/nimz19/Employee-Management-System/ims/dao"      // Correct import path for DAO
+    "github.com/nimz19/Employee-Management-System/ims/model"    // Import the model package
+    "github.com/nimz19/Employee-Management-System/ims/service"  // Import the service package
+    _ "github.com/go-sql-driver/mysql"                          // Import the MySQL driver
 )
 
 func main() {
@@ -28,36 +29,40 @@ func main() {
     // Create a new instance of EmployeeDAO
     employeeDAO := dao.NewEmployeeDAO(db)
 
-    // Use employeeDAO to add a new employee
+    // Create a new instance of EmployeeService with EmployeeDAO
+    employeeService := service.NewEmployeeService(employeeDAO)
+
+    // Define an employee to add, demonstrating business logic validations
     emp := model.Employee{
-        FirstName:  "Molly",
-        LastName:   "Richards",
-        Email:      "mollyrichards@gmail.com",
-        Department: "Software Engineer",
-        Salary:     45000.00,
+        FirstName:  "Vicky",
+        LastName:   "Crudzs",
+        Email:      "vickycrudz@gmail.com",
+        Department: "HR",
+        Salary:     30000.00,
     }
 
     // Use context with timeout for the CreateEmployee method
     ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel() // Ensure the cancel function is called to avoid context leaks
 
-
-    err = employeeDAO.CreateEmployee(ctx, emp) // Call the CreateEmployee method with context
+    // Call the EmployeeService to create the employee, allowing for validation and business logic
+    err = employeeService.CreateEmployee(ctx, emp)
     if err != nil {
         fmt.Println("Error adding employee:", err)
     } else {
         fmt.Println("Employee added successfully!")
     }
 
-	//To test the ReadEmployee method
+    // Test the ReadEmployee method through EmployeeService
     // Replace this ID with the actual ID of the employee you just added if needed
-    employeeID := 1 // Make sure this ID corresponds to the employee you expect to find
+    employeeID := 1 // Use a valid ID or dynamically retrieve it
 
     // Use context with timeout for the ReadEmployee method
     ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel() // Ensure the cancel function is called to avoid context leaks
 
-    employee, err := employeeDAO.ReadEmployee(employeeID)
+    // Call the EmployeeService to read an employee by ID
+    employee, err := employeeService.GetEmployeeByID(ctx, employeeID)
     if err != nil {
         fmt.Println("Error reading employee:", err)
     } else {
