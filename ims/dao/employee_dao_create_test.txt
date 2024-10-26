@@ -1,5 +1,9 @@
 //To test CreateEmployee
 //including edge cases like duplicate emails and invalid salaries
+//Behaviour:
+//1. Inserting a duplicate email should result in an error due to the unique constraint violation
+//2. Inserting invalid salary values results in error as handled in logic in service layer
+
 
 package dao
 
