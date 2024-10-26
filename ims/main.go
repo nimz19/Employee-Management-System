@@ -41,11 +41,27 @@ func main() {
     ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
     defer cancel() // Ensure the cancel function is called to avoid context leaks
 
+
     err = employeeDAO.CreateEmployee(ctx, emp) // Call the CreateEmployee method with context
     if err != nil {
         fmt.Println("Error adding employee:", err)
     } else {
         fmt.Println("Employee added successfully!")
+    }
+
+	//To test the ReadEmployee method
+    // Replace this ID with the actual ID of the employee you just added if needed
+    employeeID := 1 // Make sure this ID corresponds to the employee you expect to find
+
+    // Use context with timeout for the ReadEmployee method
+    ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel() // Ensure the cancel function is called to avoid context leaks
+
+    employee, err := employeeDAO.ReadEmployee(employeeID)
+    if err != nil {
+        fmt.Println("Error reading employee:", err)
+    } else {
+        fmt.Printf("Employee found: %+v\n", employee) // Print employee details
     }
 
     fmt.Println("Successfully connected to the database!")
