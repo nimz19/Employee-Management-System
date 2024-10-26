@@ -1,3 +1,6 @@
+//change this .go to testing
+can only have one _test.go file in each folder
+
 //Need to use a mock database
 //Since actual database operations in unit tests is slow and difficult to maintain
 //A popular package for mocking SQL database interactions in Go is sql mock

@@ -1,0 +1,84 @@
+//To test CreateEmployee
+//including edge cases like duplicate emails and invalid salaries
+
+package dao
+
+import (
+	"context"
+	"fmt"
+	"regexp"
+	"strings"
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/nimz19/Employee-Management-System/ims/model"
+)
+
+func TestCreateEmployee(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	// Initialize DAO with mock database
+	employeeDAO := NewEmployeeDAO(db)
+
+	// Define the employee to be added
+	emp := model.Employee{
+		FirstName:  "Izzah",
+		LastName:   "Zafer",
+		Email:      "izzahzafer@gmail.com",
+		Department: "Engineering",
+		Salary:     50000,
+	}
+
+	// Expect the INSERT query with the employee details
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO employees (first_name, last_name, email, department, salary) VALUES (?, ?, ?, ?, ?)")).
+		WithArgs(emp.FirstName, emp.LastName, emp.Email, emp.Department, emp.Salary).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	// Execute CreateEmployee
+	ctx := context.TODO()
+	err = employeeDAO.CreateEmployee(ctx, emp)
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	// Ensure all expectations were met
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestCreateEmployeeDuplicateEmail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	emp := model.Employee{
+		FirstName:  "Izzah",
+		LastName:   "Zafer",
+		Email:      "duplicate@example.com",
+		Department: "Engineering",
+		Salary:     50000,
+	}
+
+	// Simulate a duplicate email constraint violation
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO employees (first_name, last_name, email, department, salary) VALUES (?, ?, ?, ?, ?)")).
+		WithArgs(emp.FirstName, emp.LastName, emp.Email, emp.Department, emp.Salary).
+		WillReturnError(fmt.Errorf("duplicate key value violates unique constraint \"employees_email_key\""))
+
+	ctx := context.TODO()
+	err = employeeDAO.CreateEmployee(ctx, emp)
+	if err == nil || !strings.Contains(err.Error(), "duplicate key value") {
+		t.Errorf("Expected duplicate key error, got: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
