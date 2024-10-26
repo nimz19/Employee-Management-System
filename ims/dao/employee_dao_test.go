@@ -1,0 +1,171 @@
+//Need to use a mock database
+//Since actual database operations in unit tests is slow and difficult to maintain
+//A popular package for mocking SQL database interactions in Go is sql mock
+//install it first to do unit testing: go get github.com/DATA-DOG/go-sqlmock
+
+package dao
+
+import (
+	"context"
+	//regexp to make the SQL query matching more flexible
+	"regexp" //in sqlmock, query matching can fail if there are slight difference (white space)
+	"testing"
+
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/nimz19/Employee-Management-System/ims/model"
+)
+
+func TestCreateEmployee(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	emp := model.Employee{
+		FirstName:  "Izzah",
+		LastName:   "Zafer",
+		Email:      "izzahzafer@gmail.com",
+		Department: "Engineering",
+		Salary:     50000,
+	}
+
+	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO employees (first_name, last_name, email, department, salary) VALUES (?, ?, ?, ?, ?)")).
+		WithArgs(emp.FirstName, emp.LastName, emp.Email, emp.Department, emp.Salary).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	ctx := context.TODO()
+	err = employeeDAO.CreateEmployee(ctx, emp)
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestReadEmployee(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	expectedEmployee := model.Employee{
+		ID:         1,
+		FirstName:  "Izzah",
+		LastName:   "Zafer",
+		Email:      "izzahzafer@gmail.com",
+		Department: "Engineering",
+		Salary:     50000,
+	}
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT id, first_name, last_name, email, department, salary FROM employees WHERE id = ?")).
+		WithArgs(expectedEmployee.ID).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "department", "salary"}).
+			AddRow(expectedEmployee.ID, expectedEmployee.FirstName, expectedEmployee.LastName, expectedEmployee.Email, expectedEmployee.Department, expectedEmployee.Salary))
+
+	emp, err := employeeDAO.ReadEmployee(expectedEmployee.ID)
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	if emp != expectedEmployee {
+		t.Errorf("Expected %+v, got %+v", expectedEmployee, emp)
+	}
+}
+
+func TestUpdateEmployee(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	emp := model.Employee{
+		ID:         1,
+		FirstName:  "Izzah",
+		LastName:   "Zafer",
+		Email:      "izzahzafer@gmail.com",
+		Department: "Engineering",
+		Salary:     60000,
+	}
+
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE employees SET first_name = ?, last_name = ?, email = ?, department = ?, salary = ? WHERE id = ?")).
+		WithArgs(emp.FirstName, emp.LastName, emp.Email, emp.Department, emp.Salary, emp.ID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = employeeDAO.UpdateEmployee(emp)
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestDeleteEmployee(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	employeeID := 1
+
+	mock.ExpectExec(regexp.QuoteMeta("DELETE FROM employees WHERE id = ?")).
+		WithArgs(employeeID).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	err = employeeDAO.DeleteEmployee(employeeID)
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Unfulfilled expectations: %v", err)
+	}
+}
+
+func TestGetAllEmployees(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Failed to create mock database: %v", err)
+	}
+	defer db.Close()
+
+	employeeDAO := NewEmployeeDAO(db)
+	expectedEmployees := []model.Employee{
+		{ID: 1, FirstName: "Izzah", LastName: "Zafer", Email: "izzahzafer@gmail.com", Department: "Engineering", Salary: 50000},
+		{ID: 2, FirstName: "John", LastName: "Doe", Email: "johndoe@gmail.com", Department: "HR", Salary: 40000},
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "department", "salary"})
+	for _, emp := range expectedEmployees {
+		rows.AddRow(emp.ID, emp.FirstName, emp.LastName, emp.Email, emp.Department, emp.Salary)
+	}
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT id, first_name, last_name, email, department, salary FROM employees")).
+		WillReturnRows(rows)
+
+	employees, err := employeeDAO.GetAllEmployees()
+	if err != nil {
+		t.Errorf("Error was not expected: %v", err)
+	}
+
+	if len(employees) != len(expectedEmployees) {
+		t.Errorf("Expected %d employees, got %d", len(expectedEmployees), len(employees))
+	}
+
+	for i, emp := range employees {
+		if emp != expectedEmployees[i] {
+			t.Errorf("Expected %+v, got %+v", expectedEmployees[i], emp)
+		}
+	}
+}
