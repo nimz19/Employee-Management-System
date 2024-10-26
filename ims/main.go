@@ -1,13 +1,15 @@
 package main
 
 import (
+    "context"
     "database/sql"
     "fmt"
     "log"
+    "time"
 
-    "github.com/nimz19/Employee-Management-System/ims/dao" // Correct import path
-    "github.com/nimz19/Employee-Management-System/ims/model" // Add this line to import the model package
-    _ "github.com/go-sql-driver/mysql" // Import the MySQL driver
+    "github.com/nimz19/Employee-Management-System/ims/dao"  // Correct import path
+    "github.com/nimz19/Employee-Management-System/ims/model" // Import the model package
+    _ "github.com/go-sql-driver/mysql"                       // Import the MySQL driver
 )
 
 func main() {
@@ -18,19 +20,28 @@ func main() {
     }
     defer db.Close() // Ensure the database connection is closed
 
+    // Ping the database to verify connection
+    if err := db.Ping(); err != nil {
+        log.Fatal("Failed to connect to the database:", err)
+    }
+
     // Create a new instance of EmployeeDAO
     employeeDAO := dao.NewEmployeeDAO(db)
 
-    // Use employeeDAO, e.g., to test adding an employee (you might need to create an Employee first)
+    // Use employeeDAO to add a new employee
     emp := model.Employee{
-        FirstName:  "Izzah",
-        LastName:   "Zafer",
-        Email:      "izzahzafer@gmail.com",
+        FirstName:  "Amy",
+        LastName:   "O'Connor",
+        Email:      "amy123@gmail.com",
         Department: "Software Engineer",
         Salary:     45000.00,
     }
 
-    err = employeeDAO.CreateEmployee(emp) // Call the CreateEmployee method
+    // Use context with timeout for the CreateEmployee method
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel() // Ensure the cancel function is called to avoid context leaks
+
+    err = employeeDAO.CreateEmployee(ctx, emp) // Call the CreateEmployee method with context
     if err != nil {
         fmt.Println("Error adding employee:", err)
     } else {
