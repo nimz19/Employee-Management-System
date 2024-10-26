@@ -1,5 +1,5 @@
 //To separate the business logic from the data access layer (DAO)
-//Benefial for
+//Beneficial for
 //1. Encapsulation of Business Logic
 //2. Modular Code
 //3. Easier testing
