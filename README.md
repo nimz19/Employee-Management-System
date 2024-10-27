@@ -17,6 +17,7 @@ A command-line Employee Management System backend built in Go. This system enabl
 
 ## IMS Backend Project Structure
 
+```plaintext
 ims-backend/
 ├── dao/                   # Data access layer for database interactions
 │   ├── employee_dao.go    # Employee DAO for CRUD operations on employee data
@@ -30,5 +31,5 @@ ims-backend/
 ├── go.mod                 # Go module dependencies
 └── README.md              # Project documentation
 
-
+### Code Walkthrough
 
