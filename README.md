@@ -36,24 +36,24 @@ ims-backend/
 ```
 ## Code Walkthrough
 
---**main.go** (Main Program):
+-**main.go** (Main Program):
   - Set up database connection and initializes services
   - Calls EmployeeService for business logic operations and EmployeeDAO for data access
   - 
---**employee_dao.go** (Data Access Layer):
+-**employee_dao.go** (Data Access Layer):
     - Defines methods to interact with the database using CRUD operations
     - States the SQL queries for operations like creating, reading, updating, and deleting     
       employee records
     - Handles database connection errors and loggic error details for troubleshooting
       
---**employee_service.go** (Business Logic Layer):
+-**employee_service.go** (Business Logic Layer):
     - Validates employee data before passing it to EmployeeDAO for database operations
     - includes business rules and constraints, to ensure salary is positive and email is non-  
       empty
     - Provides core methods for managing employees: CreateEmployee, GetEmployeeByID, 
       UpdateEmployee, DeleteEmployee, and GetAllEmployees.
       
---**cli.go** (Command Line Interface):
+-**cli.go** (Command Line Interface):
     -a command line text-based menu to interact with the system      
       
     
