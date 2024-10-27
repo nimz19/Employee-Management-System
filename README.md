@@ -32,3 +32,11 @@ ims-backend/
 ├── main.go                # Entry point of the application
 ├── go.mod                 # Go module dependencies
 └── README.md              # Project documentation
+
+## Usage Instructions
+
+To run the Employee Management System, execute the following command in your terminal:
+
+```bash
+go run main.go
+
