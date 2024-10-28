@@ -60,6 +60,9 @@ ims-backend/
 - A command-line text-based menu to interact with the system.
 
       
-    
+ ### Useful Commands
+ in command prompt to kill process
+ Find port: netstat -aon | findstr :8080
+ Kill (find PID number): taskkill /PID 19776 /F 
 
 
