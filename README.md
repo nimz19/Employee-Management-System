@@ -1,6 +1,6 @@
 # Employee-Management-System
 
-A command-line Employee Management System backend built in Go. This system enables users to manage employees, supporting operations such as adding new employees, updating records, retrieving details, and listing all employees.
+A command-line and web UI Employee Management System backend built in Go. This system enables users to manage employees, supporting operations such as adding new employees, updating records, retrieving details, and listing all employees.
 
 ## Features
 
