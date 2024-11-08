@@ -17,7 +17,7 @@ A command-line Employee Management System backend built in Go. This system enabl
 - **Context**: Used to manage request timeouts and cancellations.
 - **_test.go**: For unit testing of core functionalities.
 
-## IMS Backend Project Structure
+## Project Structure
 
 ```plaintext
 Employee-Manangement-System/
