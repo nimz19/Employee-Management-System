@@ -20,18 +20,25 @@ A command-line Employee Management System backend built in Go. This system enabl
 ## IMS Backend Project Structure
 
 ```plaintext
-ims-backend/
-├── dao/                   # Data access layer for database interactions
-│   ├── employee_dao.go    # Employee DAO for CRUD operations on employee data
-├── model/                 # Data models representing database entities
-│   ├── employee.go        # Employee struct representing an employee record
-├── service/               # Business logic layer
-│   ├── employee_service.go # Service with validation and business rules for employee operations
-├── ui/                    # CLI interface for user interactions
-│   ├── cli.go             # CLI for interacting with the employee management system
-├── main.go                # Entry point of the application
-├── go.mod                 # Go module dependencies
-└── README.md              # Project documentation 
+Employee-Manangement-System/
+├── ims-backend/
+│   ├── dao/
+│   │   └── employee_dao.go
+│   ├── model/
+│   │   └── employee.go
+│   ├── service/
+│   │   └── employee_service.go
+│   ├── handlers/                # New folder for request handlers
+│   │   └── employee_handlers.go # Handler for employee-related HTTP requests
+│   ├── ui/
+│   │   └── cli.go
+│   ├── main.go
+│   ├── go.mod
+│   └── README.md
+└── frontend/
+    ├── index.html
+    ├── script.js
+    └── styles.css
 
 ```
 ## Code Walkthrough
